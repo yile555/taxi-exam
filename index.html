@@ -21,7 +21,7 @@
   --yellow:#F5C400; --on-yellow:#1B1F24; --ok:#1C7343; --okbg:#E1F1E6; --bad:#B3261E; --badbg:#FBE5E2;
   --display:"LXGW WenKai TC","Noto Sans TC","PingFang TC","Microsoft JhengHei",serif;
   --body:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --mono:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#121417; --card:#1B1E22; --ink:#ECEEF0; --muted:#9AA1A9; --line:#2D3238; --chip:#262A2F;
@@ -182,7 +182,7 @@ td.num{font-family:var(--mono);white-space:nowrap;font-variant-numeric:tabular-n
 .selrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
 .selrow label{display:flex;align-items:center;gap:8px;font-size:15px}
 .selrow select{font:700 16px var(--body);padding:8px 10px;border:1.5px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);min-height:44px}
-@media (max-width:520px){.dash{grid-template-columns:1fr;justify-items:center}.dash .kv{width:100%}}
+@media (max-width:520px){.dash{gap:14px}.dash>.ring{width:96px;height:96px}.dash .ring .ct b{font-size:19px}.kv b{font-size:19px}}
 .sim{--sbg:#F1F1F7;--sink:#3A3F4B;--sline:#6B6F7B;--sorange:#F5A800;--spurple:#7468C9;--sring:#8C90C9;background:var(--sbg);color:var(--sink);border:1px solid #DCDCE6;border-radius:6px}
 .simbar{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:6px 26px;align-items:center;background:var(--sbg);border-bottom:1px solid #DCDCE6;padding:12px 18px;font-size:19px;font-weight:700;color:var(--sink);border-radius:6px 6px 0 0}
 .simbar .timer{font:700 20px Georgia,"Times New Roman",serif}
@@ -225,6 +225,15 @@ body.on-exam header.top,body.on-exam footer,body.on-exam .checker{display:none}
 .regintro{font-size:16px;line-height:1.7;margin:0}
 .regpick select{font:700 20px var(--body);padding:12px 14px;border:2px solid var(--ink);border-radius:12px;background:var(--card);color:var(--ink);width:100%;min-height:56px}
 .linkbtn{border:0;background:none;color:var(--ink);text-decoration:underline;font:inherit;cursor:pointer;padding:0}
+.bigsel{font:700 18px var(--body);padding:12px 14px;border:2px solid var(--ink);border-radius:12px;background:var(--card);color:var(--ink);width:100%;min-height:54px}
+.dd{position:relative}
+.ddbtn{display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;cursor:pointer}
+.ddbtn span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ddarrow{font-size:16px}
+.ddlist{position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:8;background:var(--card);border:2px solid var(--ink);border-radius:12px;max-height:60vh;overflow:auto;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.dditem{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font:500 17px var(--body);padding:12px 14px;text-align:left;cursor:pointer}
+.dditem:hover,.dditem[aria-selected="true"]{background:var(--chip)}
+.dditem .ddn{color:var(--muted);font-size:15px;white-space:nowrap;font-variant-numeric:tabular-nums}
 .btn.big{font-size:19px;min-height:58px}
 .reglast{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--yellow);color:var(--on-yellow);border-radius:14px;padding:16px 20px}
 .reglast b{font-size:20px}
@@ -241,6 +250,8 @@ body.on-exam header.top,body.on-exam footer,body.on-exam .checker{display:none}
 .notice{background:var(--chip);border-radius:10px;padding:12px 14px;font-size:14.5px;line-height:1.6}
 body.on-regions #regchip,body.on-regions #nav-home,body.on-regions #nav-wrong,body.on-regions #nav-notes{display:none}
 body.on-regions nav.tabs{display:none}
+details.rules summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--ink);padding:6px 0}
+details.rules ul{margin:6px 0 0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
 footer{font-size:12.5px;color:var(--muted);line-height:1.6}
 @media (max-width:520px){
   .brand h1{font-size:24px}
@@ -258,7 +269,6 @@ footer{font-size:12.5px;color:var(--muted);line-height:1.6}
   <header class="top">
     <div class="brand">
       <h1>計程車執登模擬考</h1>
-      <small>計程車駕駛人執業登記測驗・依警政署 115/10/14 下載題庫</small>
 
     </div>
     <div class="fontsz" role="group" aria-label="字體大小"><span>字體</span>
@@ -272,8 +282,14 @@ footer{font-size:12.5px;color:var(--muted);line-height:1.6}
   </header>
   <main id="app"></main>
   <footer>
-    題目與答案取自內政部警政署「計程車駕駛人服務網」題庫（地理環境目前已收錄宜蘭、花蓮、臺東三縣題庫）。熱門度依新北市政府警察局公開的 6 份交通法規歷年考卷（112–114 年）比對。考試以官方題庫答案計分。
-    <div class="sync" id="sync">作答紀錄儲存於本裝置。</div>
+    <details class="rules"><summary>相關說明</summary><ul>
+    <li><b>考試規則：</b>交通法規、地理環境各考一次；是非題與選擇題每題 2 分，各科 70 分及格，限時 60 分鐘。</li>
+    <li><b>地理考試範圍：</b>報考縣市及鄰近縣市，依汽車運輸業管理規則 附表七「計程車客運業營業區域劃分」。目前已收錄宜蘭、花蓮、臺東三縣題庫。</li>
+    <li><b>模擬考：</b>比照考場電腦作答畫面，題目由官方題庫隨機抽出，交卷後顯示成績與解答。交通法規會提高常考題的出題比例。</li>
+    <li><b>綜合練習：</b>優先出還沒做過的題目，並混入答錯的題目複習，作答後立即顯示答案。</li>
+    <li><b>答錯紀錄：</b>答錯的題目自動加入，同一題連續答對 2 次後移出。</li>
+    <li><b>題庫來源：</b>內政部警政署「計程車駕駛人服務網」（115/10/14 下載）。常考題依新北市政府警察局公開的 6 份交通法規歷年考卷（112–114 年）統計。考試以官方題庫答案計分。</li>
+    <li class="sync" id="sync">作答紀錄儲存於本裝置。</li></ul></details>
   </footer>
 </div>
 
@@ -521,7 +537,7 @@ function topicsOf(s){const m=new Map();for(const q of poolOf(s)){if(!m.has(q.c))
 /* ---------- start sessions ---------- */
 function startExam(){
   const pool=poolOf(state.subj);
-  const w=state.subj==='law'&&state.hot;
+  const w=state.subj==='law';
   const [nt,nm]=R().fmt;const tf=pick(pool.filter(q=>q.t==='tf'),nt,w), mc=pick(pool.filter(q=>q.t==='mc'),nm,w);
   begin('exam','模擬考・'+SUBJ[state.subj].name,[...tf,...mc]);
 }
@@ -555,61 +571,41 @@ function vHome(){
   const wrongN=Object.keys(P.wrong).filter(k=>ALL[k]&&ALL[k].s===s).length;
   const seenN=pool.filter(q=>P.seen[q.k]).length;
   const last=P.exams.filter(e=>e.s===s).slice(-1)[0];
-  let h=`<div class="row"><div class="seg" role="group" aria-label="科目">
+  let h=`<div class="row" style="justify-content:space-between"><div class="seg" role="group" aria-label="科目">
     <button id="subj-law" data-subj="law" aria-pressed="${s==='law'}">交通法規</button>
-    <button id="subj-geo" data-subj="geo" aria-pressed="${s==='geo'}" ${geoReady()?'':'disabled style="opacity:.45;cursor:not-allowed"'}>地理環境</button></div></div>`;
-  {const r=R(),miss=r.scope.filter(c=>!CODE[c]);
-   h+=`<div class="notice"><b>📍 ${esc(r.name)}</b>　<button class="linkbtn" id="to-regions">換縣市</button><br><b>地理考試範圍：${esc(scopeText(r))}</b><br>`+
-   (r.full?`${r.scope.length} 個縣市題庫皆已收錄。`:
-    geoReady()?`已收錄：${esc(r.have.map(short).join('、'))}；整理中：${esc(miss.map(short).join('、'))}。`:
-    `地理題庫整理中，目前可練習交通法規。`)+`</div>`;}
+    <button id="subj-geo" data-subj="geo" aria-pressed="${s==='geo'}" ${geoReady()?'':'disabled style="opacity:.45;cursor:not-allowed"'}>地理環境</button></div>
+    <button class="regchip" id="to-regions">📍 ${esc(R().name)}</button></div>`;
   if(s==='geo'){const g=R().geo;const n=c=>BANK.geo.filter(q=>q.k[0]===c).length;const b=(id,v,t)=>`<button id="geo-${id}" data-geo="${v}" aria-pressed="${state.geo===v||(v==='all'&&!g.includes({hl:'H',tt:'T',yl:'Y'}[state.geo]))}" style="font-size:14px;padding:8px 12px">${t}</button>`;
-    if(g.length>1){h+=`<div class="row"><span class="muted small">地理範圍</span><div class="seg" role="group" aria-label="地理範圍" style="border-width:1px;flex-wrap:wrap">
-    ${b('all','all','全部（'+g.reduce((a,c)=>a+n(c),0)+'）')}${[['Y','yl'],['H','hl'],['T','tt']].filter(([c])=>g.includes(c)).map(([c,v])=>b(v,v,short(BYCODE[c])+'（'+n(c)+'）')).join('')}</div></div>`;}}
+    if(g.length>1){h+=`<div class="seg" role="group" aria-label="地理範圍" style="border-width:1px;flex-wrap:wrap;align-self:flex-start">
+    ${b('all','all','全部')}${[['Y','yl'],['H','hl'],['T','tt']].filter(([c])=>g.includes(c)).map(([c,v])=>b(v,v,short(BYCODE[c]))).join('')}</div>`;}}
   {const pct=pool.length?seenN/pool.length:0;
-  h+=`<section class="card"><div class="dash">${ring(pct,Math.floor(pct*1000)/10+'%','題庫完成度')}
-    <div class="kv"><div><b>${seenN}</b><span>已練習題數</span></div><div><b>${pool.length}</b><span>題庫題數</span></div>
+  h+=`<section class="card"><div class="dash">${ring(pct,Math.floor(pct*1000)/10+'%','已練習')}
+    <div class="kv"><div><b>${seenN}</b><span>已練習</span></div><div><b>${pool.length}</b><span>題庫</span></div>
     <div><b>${wrongN}</b><span>答錯紀錄</span></div><div><b>${last?last.score:'—'}</b><span>上次模擬考</span></div></div></div></section>`;}
-  h+=`<section class="card"><h2>模擬考</h2>
-    <p class="muted small" style="margin:0">比照考場電腦作答畫面：是非 ${R().fmt[0]} 題＋選擇 ${R().fmt[1]} 題，每題 2 分，<b>70 分及格</b>，限時 ${EXAM_MIN} 分鐘，交卷後顯示成績與解答。題目由官方題庫隨機抽出。</p>
-    ${s==='law'?`<label class="check" for="opt-hot"><input type="checkbox" id="opt-hot" ${state.hot?'checked':''}><span>提高常考題出題比例<br><span class="muted small">歷年考卷常出現的題目，出題機率較高</span></span></label>`:''}
-    <div class="row"><button class="btn primary" id="go-brief">開始模擬考（${R().fmt[0]+R().fmt[1]} 題）</button>
-    ${wrongN?`<button class="btn" id="go-wrong">練答錯題目（${Math.min(wrongN,30)} 題）</button>`:''}</div></section>`;
-  {const left=pool.filter(q=>!P.seen[q.k]).length,pct=Math.round(seenN/pool.length*100);
+  h+=`<section class="card"><h2>模擬考</h2><button class="btn primary big" id="go-brief">開始模擬考</button></section>`;
   h+=`<section class="card"><h2>綜合練習</h2>
-    <p class="muted small" style="margin:0">測驗題目由官方題庫抽出，完整練習整個題庫是最可靠的準備方式。題數與題型可自選，優先出還沒做過的題目，並混入答錯紀錄的題目複習；作答後立即顯示答案與說明。</p>
-    <div><div class="muted small">題庫完成度：${seenN} / ${pool.length} 題（${pct}%）${left?`，尚有 ${left} 題未練習`:'，已全部練習一遍'}</div><div class="bar" style="margin-top:6px"><i style="width:${pct}%"></i></div></div>
     <div class="selrow"><label for="mix-n">題數<select id="mix-n">${[10,20,30,50].map(n=>`<option value="${n}" ${state.mixN===n?'selected':''}>${n} 題</option>`).join('')}</select></label>
-    <label for="mix-t">題型<select id="mix-t">${[['all','是非＋選擇'],['tf','只練是非'],['mc','只練選擇']].map(([v,t])=>`<option value="${v}" ${state.mixT===v?'selected':''}>${t}</option>`).join('')}</select></label></div>
-    <div class="row"><button class="btn primary" id="go-mixed">開始綜合練習（${state.mixN} 題）</button></div></section>`;}
-  h+=`<section class="card"><h2>分類練習</h2><p class="muted small" style="margin:0">依題型分類練習，每輪最多 30 題，作答後立即顯示答案與說明。</p><div class="topics">`;
-  for(const [name,qs] of topicsOf(s)){
-    const seen=qs.filter(q=>P.seen[q.k]).length, hotAvg=qs.reduce((a,q)=>a+(q.h>=5?1:0),0)/qs.length;
-    const tag=s==='law'?(hotAvg>=.5?'<span class="stars">熱門 ★★★</span>':hotAvg>=.25?'<span class="stars">常考 ★★</span>':''):'';
-    h+=`<div class="topic"><div class="name">${esc(name)}${tag}</div>
-      <div class="meta">${qs.length} 題・做過 ${seen} 題<div class="bar" style="margin-top:4px"><i style="width:${Math.round(seen/qs.length*100)}%"></i></div></div>
-      <button class="btn ghost go" data-topic="${esc(name)}">開始練習</button></div>`;
-  }
-  h+='</div></section>';
+    <label for="mix-t">題型<select id="mix-t">${[['all','是非＋選擇'],['tf','是非題'],['mc','選擇題']].map(([v,t])=>`<option value="${v}" ${state.mixT===v?'selected':''}>${t}</option>`).join('')}</select></label></div>
+    <button class="btn primary big" id="go-mixed">開始綜合練習</button></section>`;
+  {const ts=topicsOf(s);if(!ts.some(([n])=>n===state.topic))state.topic=ts[0]?ts[0][0]:'';
+  h+=`<section class="card"><h2>分類練習</h2>
+    <div class="dd"><button class="bigsel ddbtn" id="topic-open" aria-expanded="${!!state.ddOpen}"><span>${esc(state.topic)}</span><span class="ddarrow">▾</span></button>
+    ${state.ddOpen?`<div class="ddlist" role="listbox">${ts.map(([name,qs])=>{const seen=qs.filter(q=>P.seen[q.k]).length;return `<button role="option" class="dditem" data-pick-topic="${esc(name)}" aria-selected="${name===state.topic}"><span>${esc(name)}</span><span class="ddn">${seen} / ${qs.length} 題</span></button>`;}).join('')}</div>`:''}</div>
+    <button class="btn primary big" id="go-topic">開始分類練習</button></section>`;}
   return h;
 }
 
 function regStatus(r){
-  if(r.full) return `✓ 交通法規、地理環境皆可練習<br>地理範圍：${esc(scopeText(r))}（共 ${r.geo.reduce((a,c)=>a+BANK.geo.filter(q=>q.k[0]===c).length,0)} 題）`;
-  if(r.geo.length) return `地理範圍：${esc(scopeText(r))}<br>已收錄：${esc(r.have.map(short).join('、'))}；整理中：${esc(r.scope.filter(c=>!CODE[c]).map(short).join('、'))}<br>交通法規可完整練習`;
-  return `地理範圍：${esc(scopeText(r))}<br>地理題庫整理中；交通法規可完整練習`;
+  return '地理範圍：'+esc(scopeText(r))+(r.full?'':r.geo.length?'（部分題庫整理中）':'（題庫整理中）');
 }
 function vRegions(){
   const cur=REG[state.pick||state.region]||REG['花蓮縣'];
   let opts='';
   for(const a of REGIONS){opts+=`<optgroup label="${a.area}">`+a.list.map(r=>`<option value="${esc(r.id)}" ${r.id===cur.id?'selected':''}>${esc(r.name)}</option>`).join('')+'</optgroup>';}
-  return `<section class="card regpick"><h2>選擇報考縣市</h2>
-    <p class="regintro">地理環境測驗範圍依「計程車客運業營業區域劃分」，以報考縣市及鄰近縣市為考試範圍。選擇縣市後自動載入對應題庫。</p>
-    <label for="reg-select" class="muted small">報考縣市</label>
+  return `<section class="card regpick"><h2><label for="reg-select">選擇報考縣市</label></h2>
     <select id="reg-select">${opts}</select>
-    <div class="notice" id="reg-status">${regStatus(cur)}</div>
-    <button class="btn primary big" data-region="${esc(cur.id)}" id="reg-go">開始練習</button>
-    <p class="muted small" style="margin:0">鄰近縣市依據：汽車運輸業管理規則 附表七「計程車客運業營業區域劃分」。</p></section>`;
+    <p class="muted small" id="reg-status" style="margin:0">${regStatus(cur)}</p>
+    <button class="btn primary big" data-region="${esc(cur.id)}" id="reg-go">開始練習</button></section>`;
 }
 
 function vBrief(){
@@ -634,7 +630,6 @@ function vBrief(){
   <tr><td>是非題</td><td class="num">${nt} 題</td><td class="num">每題 2 分</td></tr>
   <tr><td>選擇題</td><td class="num">${nm} 題</td><td class="num">每題 2 分</td></tr></tbody></table></div>
   <p class="big">及格分數：<b>70 分</b>（滿分 100 分）<br>測驗時間：<b>${EXAM_MIN} 分鐘</b>，時間到自動交卷<br>平均每題約 <b>${sec} 秒</b>內作答</p>
-  <p class="muted small" style="margin:0;text-align:center">作答畫面比照考場電腦測驗：所有題目列在同一頁，點選題號下方的數字作答，完成後按右下角「交卷」。</p>
   <div class="navrow"><button class="btn" id="r-home">回練習頁</button><button class="btn primary big" id="go-exam">${L&&L.items[0].s===state.subj?'再考一次':'開始測驗'}</button></div></section>`+rec;
 }
 
@@ -733,9 +728,8 @@ function vWrong(){
   for(const s of ['law','geo']){
     const ks=Object.keys(P.wrong).filter(k=>ALL[k]&&ALL[k].s===s).sort((a,b)=>P.wrong[b]-P.wrong[a]);
     h+=`<section class="card"><h2>${SUBJ[s].name}答錯紀錄（${ks.length}）</h2>`;
-    if(!ks.length){h+=`<p class="muted" style="margin:0">目前沒有答錯紀錄。模擬考與分類練習答錯的題目會自動加入；同一題連續答對 2 次後移出。</p></section>`;continue;}
-    h+=`<p class="muted small" style="margin:0">同一題連續答對 2 次後移出答錯紀錄，依答錯次數排序。</p>
-      <div class="row"><button class="btn primary" data-wrong="${s}">重練答錯題目（${Math.min(ks.length,30)} 題）</button></div><div class="wlist">`;
+    if(!ks.length){h+=`<p class="muted" style="margin:0">目前沒有答錯紀錄。</p></section>`;continue;}
+    h+=`<div class="row"><button class="btn primary" data-wrong="${s}">重練答錯題目（${Math.min(ks.length,30)} 題）</button></div><div class="wlist">`;
     for(const k of ks.slice(0,60)){const q=ALL[k];
       h+=`<div class="witem"><div class="chips"><span class="chip">錯 ${P.wrong[k]} 次</span><span class="chip">${esc(q.c)}</span>${stars(q.h)}</div>
       <div>${esc(q.q)}</div>${q.t==='mc'?`<div class="muted small">${q.o.map((t,i)=>'('+(i+1)+') '+esc(t)).join('　')}</div>`:''}
@@ -880,7 +874,9 @@ app.addEventListener('click',e=>{
   const t=e.target.closest('button'); if(!t) return;
   const id=t.id;
   if(t.dataset.region){state.pick=null;state.region=t.dataset.region;state.geo='all';saveUi();state.view='home';render();window.scrollTo(0,0);return;}
-  if(t.dataset.subj){state.subj=t.dataset.subj;saveUi();render();return;}
+  if(t.id==='topic-open'){state.ddOpen=!state.ddOpen;render();return;}
+  if(t.dataset.pickTopic){state.topic=t.dataset.pickTopic;state.ddOpen=false;render();return;}
+  if(t.dataset.subj){state.ddOpen=false;state.subj=t.dataset.subj;saveUi();render();return;}
   if(t.dataset.geo){state.geo=t.dataset.geo;saveUi();render();return;}
   if(t.dataset.topic){startTopic(t.dataset.topic);return;}
   if(t.dataset.wrong){startWrong(t.dataset.wrong);return;}
@@ -904,6 +900,7 @@ app.addEventListener('click',e=>{
     case 'go-brief': state.view='brief'; render(); window.scrollTo(0,0); break;
     case 'go-exam': startExam(); break;
     case 'go-mixed': startMixed(); break;
+    case 'go-topic': state.ddOpen=false; startTopic(state.topic); break;
     case 'go-wrong': startWrong(state.subj); break;
     case 'q-prev': go(state.quiz.idx-1); break;
     case 'q-next': go(state.quiz.idx+1); window.scrollTo(0,0); break;
@@ -920,6 +917,7 @@ app.addEventListener('click',e=>{
 app.addEventListener('change',e=>{
   if(e.target.id==='reg-select'){state.pick=e.target.value;const r=REG[state.pick];document.getElementById('reg-status').innerHTML=regStatus(r);document.getElementById('reg-go').dataset.region=r.id;return;}
   if(e.target.name==='rep-type'&&state.rep){state.rep.type=e.target.value;const n=document.getElementById('rep-note');if(n)state.rep.note=n.value;return;}
+  if(e.target.id==='topic-sel'){state.topic=e.target.value;return;}
   if(e.target.id==='mix-n'){state.mixN=Number(e.target.value);saveUi();render();return;}
   if(e.target.id==='mix-t'){state.mixT=e.target.value;saveUi();return;}
   if(e.target.id==='opt-hot'){state.hot=e.target.checked;saveUi();}
@@ -934,6 +932,7 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='ArrowRight'&&z.idx<z.items.length-1){go(z.idx+1);}
   else if(e.key==='ArrowLeft'&&z.idx>0){go(z.idx-1);}
 });
+document.addEventListener('click',e=>{if(state.ddOpen&&!e.target.closest('.dd')){state.ddOpen=false;render();}});
 setInterval(()=>{
   const z=state.quiz; if(!z||z.done) return;
   if(z.limit&&Date.now()-z.start>=z.limit){z.timeout=true;finish();return;}

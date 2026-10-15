@@ -155,6 +155,27 @@ th{font-size:13px;color:var(--muted);font-weight:500;letter-spacing:.04em}
 td.num{font-family:var(--mono);white-space:nowrap;font-variant-numeric:tabular-nums;font-weight:600}
 .sync{font-size:12.5px;color:var(--muted)}
 .confirm{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.rings{display:flex;justify-content:space-around;gap:8px;flex-wrap:nowrap}
+.rhead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px 12px}
+.rhead .selrow{gap:8px}
+.rhead select{font:700 15px var(--body);padding:6px 8px;border:1.5px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);min-height:40px}
+.rwrong{font-size:13px;color:var(--muted);white-space:nowrap}
+.rwrong.has{color:var(--bad);font-weight:700}
+.rbtn{border:2px solid transparent;background:transparent;color:inherit;font:inherit;border-radius:14px;padding:8px 6px;cursor:pointer}
+.rbtn:hover{background:var(--chip)}
+.rbtn[aria-pressed="true"]{border-color:var(--ink);background:var(--chip)}
+.rbtn[aria-pressed="true"] .ring .tr,.rbtn:hover .ring .tr{stroke:var(--card)}
+.rcell{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.rings .ring{width:128px;height:128px}
+.rings .ring .ct b{font-size:22px}
+.rsub{white-space:nowrap;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.kvline{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 28px;border-top:1px solid var(--line);padding-top:12px;font-size:15px;color:var(--muted)}
+.kvline b{color:var(--ink);font-size:18px;margin:0 2px}
+.kv4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;text-align:center;border-top:1px solid var(--line);padding-top:12px}
+.kv4 div{display:flex;flex-direction:column}
+.kv4 b{font-size:21px;font-variant-numeric:tabular-nums;line-height:1.2}
+.kv4 span{font-size:13px;color:var(--muted);white-space:nowrap}
+@media (max-width:520px){.rings{gap:2px}.rbtn{padding:5px 1px;border-radius:10px;min-width:0;flex:1 1 0}.rings .ring{width:68px;height:68px}.rings.single .ring{width:110px;height:110px}.rings.single .ring .ct b{font-size:20px}.rings .ring .ct b{font-size:14px}.rings .ring .ct span{font-size:11px}.rsub{font-size:11px}.kv4 b{font-size:18px}.kv4 span{font-size:11px}.kv4{gap:4px}}
 .dash{display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:center}
 .ring{position:relative;width:118px;height:118px}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
@@ -234,6 +255,8 @@ body.on-exam header.top,body.on-exam footer,body.on-exam .checker{display:none}
 .dditem{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);font:500 17px var(--body);padding:12px 14px;text-align:left;cursor:pointer}
 .dditem:hover,.dditem[aria-selected="true"]{background:var(--chip)}
 .dditem .ddn{color:var(--muted);font-size:15px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.btn.red{background:#D32F2F;border-color:#D32F2F;color:#fff}
+.btn.red:hover{background:#B71C1C;border-color:#B71C1C}
 .btn.big{font-size:19px;min-height:58px}
 .reglast{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--yellow);color:var(--on-yellow);border-radius:14px;padding:16px 20px}
 .reglast b{font-size:20px}
@@ -510,7 +533,7 @@ function commit(){saveLocal();queueSync();}
 
 /* ---------- state ---------- */
 let state={mixN:30,mixT:'all',view:'regions',region:'',subj:'law',geo:'all',hot:true,instant:true,quiz:null,confirmClear:false};
-try{const s=JSON.parse(localStorage.getItem(KEY+'-ui')||'{}'); if(s.subj) state.subj=s.subj; if(typeof s.hot==='boolean') state.hot=s.hot; if(typeof s.instant==='boolean') state.instant=s.instant; if(s.geo&&s.geo!=='both') state.geo=s.geo; if(s.region&&REG[s.region]) state.region=s.region; if([10,20,30,50].includes(s.mixN)) state.mixN=s.mixN; if(['all','tf','mc'].includes(s.mixT)) state.mixT=s.mixT;}catch(e){}
+try{const s=JSON.parse(localStorage.getItem(KEY+'-ui')||'{}'); if(s.subj) state.subj=s.subj; if(typeof s.hot==='boolean') state.hot=s.hot; if(typeof s.instant==='boolean') state.instant=s.instant;  if(s.region&&REG[s.region]) state.region=s.region; if([10,20,30,50].includes(s.mixN)) state.mixN=s.mixN; if(['all','tf','mc'].includes(s.mixT)) state.mixT=s.mixT;}catch(e){}
 function saveUi(){try{localStorage.setItem(KEY+'-ui',JSON.stringify({mixN:state.mixN,mixT:state.mixT,region:state.region,subj:state.subj,geo:state.geo,hot:state.hot,instant:state.instant}));}catch(e){}}
 
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -531,12 +554,13 @@ function pick(pool,n,weighted){
   }
   return res;
 }
+function fullPool(s){if(s!=='geo')return BANK[s];const g=R().geo;return BANK.geo.filter(q=>g.includes(q.k[0]));}
 function poolOf(s){if(s!=='geo')return BANK[s];const g=R().geo;const m={hl:'H',tt:'T',yl:'Y'}[state.geo];return BANK.geo.filter(q=>g.includes(q.k[0])&&(!m||!g.includes(m)||q.k[0]===m));}
-function topicsOf(s){const m=new Map();for(const q of poolOf(s)){if(!m.has(q.c))m.set(q.c,[]);m.get(q.c).push(q);}return [...m.entries()].sort((a,b)=>b[1].length-a[1].length);}
+function topicsOf(s){const m=new Map();for(const q of poolOf(s)){if(!m.has(q.c))m.set(q.c,[]);m.get(q.c).push(q);}const me=CODE[R().name],rk=q=>s==='geo'?(q.k[0]===me?0:q.k[0]==='H'?1:q.k[0]==='Y'?2:3):0;return [...m.entries()].sort((a,b)=>rk(a[1][0])-rk(b[1][0])||b[1].length-a[1].length);}
 
 /* ---------- start sessions ---------- */
 function startExam(){
-  const pool=poolOf(state.subj);
+  const pool=fullPool(state.subj);
   const w=state.subj==='law';
   const [nt,nm]=R().fmt;const tf=pick(pool.filter(q=>q.t==='tf'),nt,w), mc=pick(pool.filter(q=>q.t==='mc'),nm,w);
   begin('exam','模擬考・'+SUBJ[state.subj].name,[...tf,...mc]);
@@ -548,7 +572,7 @@ function startMixed(){
   const unseen=pool.filter(q=>!P.seen[q.k]&&!used.has(q.k));
   let rest=pick(unseen,N-wrong.length,w);
   if(wrong.length+rest.length<N){for(const q of rest)used.add(q.k);rest=rest.concat(pick(pool.filter(q=>!used.has(q.k)),N-wrong.length-rest.length,w));}
-  begin('mixed','綜合練習・'+SUBJ[state.subj].name,shuffle(wrong.concat(rest)),true);
+  begin('mixed','綜合練習・'+SUBJ[state.subj].name+(state.subj==='geo'&&state.geo!=='all'&&{hl:1,tt:1,yl:1}[state.geo]?'（'+{hl:'花蓮',tt:'臺東',yl:'宜蘭'}[state.geo]+'）':''),shuffle(wrong.concat(rest)),true);
 }
 function startTopic(name){
   const qs=shuffle(poolOf(state.subj).filter(q=>q.c===name).slice());
@@ -567,7 +591,7 @@ function begin(mode,title,items,forceInstant){
 /* ---------- views ---------- */
 function vHome(){
   if(state.subj==='geo'&&!geoReady()) state.subj='law';
-  const s=state.subj, pool=poolOf(s);
+  const s=state.subj, pool=fullPool(s);
   const wrongN=Object.keys(P.wrong).filter(k=>ALL[k]&&ALL[k].s===s).length;
   const seenN=pool.filter(q=>P.seen[q.k]).length;
   const last=P.exams.filter(e=>e.s===s).slice(-1)[0];
@@ -575,23 +599,24 @@ function vHome(){
     <button id="subj-law" data-subj="law" aria-pressed="${s==='law'}">交通法規</button>
     <button id="subj-geo" data-subj="geo" aria-pressed="${s==='geo'}" ${geoReady()?'':'disabled style="opacity:.45;cursor:not-allowed"'}>地理環境</button></div>
     <button class="regchip" id="to-regions">📍 ${esc(R().name)}</button></div>`;
-  if(s==='geo'){const g=R().geo;const n=c=>BANK.geo.filter(q=>q.k[0]===c).length;const b=(id,v,t)=>`<button id="geo-${id}" data-geo="${v}" aria-pressed="${state.geo===v||(v==='all'&&!g.includes({hl:'H',tt:'T',yl:'Y'}[state.geo]))}" style="font-size:14px;padding:8px 12px">${t}</button>`;
-    if(g.length>1){h+=`<div class="seg" role="group" aria-label="地理範圍" style="border-width:1px;flex-wrap:wrap;align-self:flex-start">
-    ${b('all','all','全部')}${[['Y','yl'],['H','hl'],['T','tt']].filter(([c])=>g.includes(c)).map(([c,v])=>b(v,v,short(BYCODE[c]))).join('')}</div>`;}}
-  {const pct=pool.length?seenN/pool.length:0;
-  h+=`<section class="card"><div class="dash">${ring(pct,Math.floor(pct*1000)/10+'%','已練習')}
-    <div class="kv"><div><b>${seenN}</b><span>已練習</span></div><div><b>${pool.length}</b><span>題庫</span></div>
-    <div><b>${wrongN}</b><span>答錯紀錄</span></div><div><b>${last?last.score:'—'}</b><span>上次模擬考</span></div></div></div></section>`;}
-  h+=`<section class="card"><h2>模擬考</h2><button class="btn primary big" id="go-brief">開始模擬考</button></section>`;
-  h+=`<section class="card"><h2>綜合練習</h2>
-    <div class="selrow"><label for="mix-n">題數<select id="mix-n">${[10,20,30,50].map(n=>`<option value="${n}" ${state.mixN===n?'selected':''}>${n} 題</option>`).join('')}</select></label>
-    <label for="mix-t">題型<select id="mix-t">${[['all','是非＋選擇'],['tf','是非題'],['mc','選擇題']].map(([v,t])=>`<option value="${v}" ${state.mixT===v?'selected':''}>${t}</option>`).join('')}</select></label></div>
-    <button class="btn primary big" id="go-mixed">開始綜合練習</button></section>`;
+  {const rings=[['全部',pool,'all']];
+   if(s==='geo'){const me=R().name;const order=[me,...R().have.filter(c=>c!==me)].filter(c=>CODE[c]);
+     for(const c of order) rings.push([short(c),pool.filter(q=>q.k[0]===CODE[c]),{H:'hl',T:'tt',Y:'yl'}[CODE[c]]]);}
+   const cur=s==='geo'&&['hl','tt','yl'].includes(state.geo)&&R().geo.includes({hl:'H',tt:'T',yl:'Y'}[state.geo])?state.geo:'all';
+   const rg=(t,qs,v)=>{const n=qs.filter(q=>P.seen[q.k]).length,w=qs.filter(q=>P.wrong[q.k]).length,p=qs.length?n/qs.length:0;
+     const inner=`${ring(p,Math.floor(p*1000)/10+'%',t)}<div class="rsub">${n} / ${qs.length}</div><div class="rwrong ${w?'has':''}">答錯 ${w}</div>`;
+     return `<button class="rcell rbtn" data-geo="${v}" aria-pressed="${rings.length>1&&cur===v}" aria-label="${t}綜合練習">${inner}</button>`;};
+  h+=`<section class="card"><div class="rhead"><h2>綜合練習</h2><div class="selrow">
+    <select id="mix-n" aria-label="題數">${[10,20,30,50].map(n=>`<option value="${n}" ${state.mixN===n?'selected':''}>${n} 題</option>`).join('')}</select>
+    <select id="mix-t" aria-label="題型">${[['all','是非＋選擇'],['tf','是非題'],['mc','選擇題']].map(([v,t])=>`<option value="${v}" ${state.mixT===v?'selected':''}>${t}</option>`).join('')}</select></div></div>
+    <div class="rings ${rings.length===1?'single':''}">${rings.map(([t,qs,v])=>rg(t,qs,v)).join('')}</div></section>`;}
+
   {const ts=topicsOf(s);if(!ts.some(([n])=>n===state.topic))state.topic=ts[0]?ts[0][0]:'';
   h+=`<section class="card"><h2>分類練習</h2>
     <div class="dd"><button class="bigsel ddbtn" id="topic-open" aria-expanded="${!!state.ddOpen}"><span>${esc(state.topic)}</span><span class="ddarrow">▾</span></button>
     ${state.ddOpen?`<div class="ddlist" role="listbox">${ts.map(([name,qs])=>{const seen=qs.filter(q=>P.seen[q.k]).length;return `<button role="option" class="dditem" data-pick-topic="${esc(name)}" aria-selected="${name===state.topic}"><span>${esc(name)}</span><span class="ddn">${seen} / ${qs.length} 題</span></button>`;}).join('')}</div>`:''}</div>
     <button class="btn primary big" id="go-topic">開始分類練習</button></section>`;}
+  h+=`<section class="card"><h2>模擬考</h2><button class="btn big red" id="go-brief">開始模擬考</button>${last?`<div class="muted small" style="text-align:center">上次成績 ${last.score} 分</div>`:''}</section>`;
   return h;
 }
 
@@ -877,7 +902,7 @@ app.addEventListener('click',e=>{
   if(t.id==='topic-open'){state.ddOpen=!state.ddOpen;render();return;}
   if(t.dataset.pickTopic){state.topic=t.dataset.pickTopic;state.ddOpen=false;render();return;}
   if(t.dataset.subj){state.ddOpen=false;state.subj=t.dataset.subj;saveUi();render();return;}
-  if(t.dataset.geo){state.geo=t.dataset.geo;saveUi();render();return;}
+  if(t.dataset.geo){state.geo=t.dataset.geo;saveUi();startMixed();return;}
   if(t.dataset.topic){startTopic(t.dataset.topic);return;}
   if(t.dataset.wrong){startWrong(t.dataset.wrong);return;}
   if(t.dataset.sim){const z=state.quiz,q=z.items[Number(t.dataset.sim)],v=Number(t.dataset.v);

@@ -306,7 +306,7 @@ footer{font-size:12.5px;color:var(--muted);line-height:1.6}
   </header>
   <main id="app"></main>
   <footer>
-    <div class="ver">版本 v4.17・更新日期 2026/10/16</div>
+    <div class="ver">版本 v4.18・更新日期 2026/10/16</div>
     <details class="rules"><summary>相關說明</summary><ul>
     <li><b>考試規則：</b>交通法規、地理環境各考一次；是非題與選擇題每題 2 分，各科 70 分及格，限時 60 分鐘。</li>
     <li><b>地理考試範圍：</b>報考縣市及鄰近縣市，依汽車運輸業管理規則 附表七「計程車客運業營業區域劃分」。目前已收錄宜蘭、花蓮、臺東三縣題庫。</li>
@@ -354,6 +354,7 @@ const NEAR={
  '宜蘭縣':['新北市','花蓮縣','基隆市','臺北市'],
  '澎湖縣':[],'金門縣':[],'連江縣':[]
 };
+const OPEN=new Set(['花蓮縣']); // 開放的縣市，之後要開放其他縣市就加在這裡
 const FMT={'桃園市':[25,25],'花蓮縣':[25,25]};
 const AREAS=[['東部',['花蓮縣','宜蘭縣','臺東縣']],['北部',['臺北市','新北市','基隆市','桃園市','新竹市','新竹縣']],
  ['中部',['苗栗縣','臺中市','彰化縣','南投縣','雲林縣']],['南部',['嘉義市','嘉義縣','臺南市','高雄市','屏東縣']],['離島',['澎湖縣','金門縣','連江縣']]];
@@ -363,7 +364,7 @@ const REGIONS=AREAS.map(([area,names])=>({area,list:names.map(name=>{
   const r={id:name,name,scope,have:scope.filter(c=>CODE[c]),fmt:FMT[name]||[20,30]};
   r.geo=r.have.map(c=>CODE[c]); r.full=r.have.length===scope.length; REG[name]=r; return r;})}));
 const BYCODE={}; for(const c in CODE) BYCODE[CODE[c]]=c;
-function R(){return REG[state.region]||REG['花蓮縣'];}
+function R(){return (OPEN.has(state.region)&&REG[state.region])||REG['花蓮縣'];}
 function geoReady(){return R().geo.length>0;}
 function short(c){return c.replace(/[縣市]$/,'');}
 function scopeText(r){return short(r.name)+(r.scope.length>1?'＋'+r.scope.slice(1).map(short).join('、'):'');}
@@ -627,9 +628,9 @@ function regStatus(r){
   return '地理範圍：'+esc(scopeText(r))+(r.full?'':r.geo.length?'（部分題庫整理中）':'（題庫整理中）');
 }
 function vRegions(){
-  const cur=REG[state.pick||state.region]||REG['花蓮縣'];
+  let cur=REG[state.pick||state.region]; if(!cur||!OPEN.has(cur.id)) cur=REG['花蓮縣'];
   let opts='';
-  for(const a of REGIONS){opts+=`<optgroup label="${a.area}">`+a.list.map(r=>`<option value="${esc(r.id)}" ${r.id===cur.id?'selected':''}>${esc(r.name)}</option>`).join('')+'</optgroup>';}
+  for(const a of REGIONS){opts+=`<optgroup label="${a.area}">`+a.list.map(r=>OPEN.has(r.id)?`<option value="${esc(r.id)}" ${r.id===cur.id?'selected':''}>${esc(r.name)}</option>`:`<option value="${esc(r.id)}" disabled>${esc(r.name)}（準備中）</option>`).join('')+'</optgroup>';}
   return `<section class="card regpick"><h2><label for="reg-select">選擇報考縣市</label></h2>
     <select id="reg-select">${opts}</select>
     <p class="muted small" id="reg-status" style="margin:0">${regStatus(cur)}</p>
@@ -901,7 +902,7 @@ document.querySelector('nav.tabs').addEventListener('click',e=>{
 app.addEventListener('click',e=>{
   const t=e.target.closest('button'); if(!t) return;
   const id=t.id;
-  if(t.dataset.region){state.pick=null;state.region=t.dataset.region;state.geo='all';saveUi();state.view='home';render();window.scrollTo(0,0);return;}
+  if(t.dataset.region){if(!OPEN.has(t.dataset.region))return;state.pick=null;state.region=t.dataset.region;state.geo='all';saveUi();state.view='home';render();window.scrollTo(0,0);return;}
   if(t.id==='topic-open'){state.ddOpen=!state.ddOpen;render();return;}
   if(t.dataset.pickTopic){state.topic=t.dataset.pickTopic;state.ddOpen=false;render();return;}
   if(t.dataset.subj){state.ddOpen=false;state.subj=t.dataset.subj;saveUi();render();return;}
